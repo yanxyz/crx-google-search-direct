@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "Google Search Direct",
+  "version": "1.0",
+  "description": "Add a direct link after the search result in the Google Search results page.",
+  "minimum_chrome_version": "43",
+  "author": "Ivan Yan",
+  "homepage_url": "https://github.com/yanxyz/google-search-direct",
+  "content_scripts": [{
+    "matches": ["https://*/*"],
+    "include_globs": ["https://www.google.*"],
+    "css": ["style.css"],
+    "js": ["google.js"],
+    "run_at": "document_end"
+  }],
+  "permissions": [
+    "https://*/*"
+  ]
+}
