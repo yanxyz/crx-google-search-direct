@@ -1,10 +1,10 @@
 /**
- * The search page is totally reloaded or partially loaded via AJAX.
- * If it's updated via AJAX then code should wait it update the DOM.
+ * The search result is updated via AJAX,
+ * MutationObserver is used to wait for it to complete.
  *
- * The tab url will change in every searching,
- * it may change the location hash or not.
- * So here instead of hashchange event chrome.tabs.onUpdated event is used.
+ * The tab url is changed whenever searching,
+ * however the location hash is changed only when it has '#q=' at the end.
+ * So instead of hashchange event chrome.tabs.onUpdated event is used.
  *
  */
 
@@ -12,36 +12,47 @@
 
 'use strict'
 
-// console.log(0)
-const observer = new MutationObserver(change)
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // console.log(message)
-
-  change()
-  observer.observe(document.getElementById('search'), {
-    childList: true
+// Because this script is executed many times, so 'var' is used
+var fn = debounce(addLinks, 10)
+var observer = new MutationObserver((mutations, observer) => {
+  // console.log(mutations)
+  mutations.forEach((mutation, i) => {
+    if (mutation.target.id === 'search') {
+      // console.log(i, mutations.length, mutation)
+      fn()
+    }
   })
-
-  sendResponse('test')
 })
 
-function change (mutations, observer) {
-  // console.log(1)
-  if (document.querySelector('._g_s_d')) return
+if (document.body) {
+  // console.log('body')
+  observe()
+} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    // console.log('DOMContentLoaded')
+    observe()
+  })
+}
 
+function observe () {
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  })
+}
+
+function addLinks () {
   const cites = document.querySelectorAll('#search ._Rm')
-  // console.log(2)
 
   if (cites.length) {
-    // console.log(3)
-    Array.prototype.forEach.call(cites, function (el) {
+    // NodeList has forEach method in Chrome
+    cites.forEach((el) => {
       const a = lookup(el)
       if (!a) {
         // console.log(el)
         return
       }
-      el.innerHTML = `<a href="${a.href}" class="_g_s_d">${el.innerHTML}</a>`
+      el.innerHTML = `<a href="${a.href}" class="_g_s_d" style="color: currentColor">${el.innerHTML}</a>`
     })
   }
 }
@@ -55,4 +66,12 @@ function lookup (el) {
     node = node.parentElement
   }
   return null
+}
+
+function debounce (fn, delay) {
+  let timer
+  return function () {
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => fn(arguments), delay)
+  }
 }

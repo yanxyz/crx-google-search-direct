@@ -1,13 +1,18 @@
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   const {status} = changeInfo
   const {url} = tab
-  const re = /^https:\/\/www\.google\.[a-z.]+\/.+/
 
-  if (status === 'complete' &&
-    url && url.includes('q=') && re.test(url)
+  // console.log(changeInfo)
+  // console.log(tab)
+  // console.log('--------------------')
+
+  if (status === 'loading' &&
+    url && url.startsWith('https://www.google.') && url.includes('q=')
     ) {
-    chrome.tabs.sendMessage(tabId, 'tab url is changed', null, (message) => {
-      // console.log(message)
+    // console.log(url)
+    chrome.tabs.executeScript(tabId, {
+      file: 'js/content.js',
+      runAt: 'document_start'
     })
   }
 })
