@@ -2,10 +2,9 @@
  * The search result is updated via AJAX,
  * MutationObserver is used to wait for it to complete.
  *
- * The tab url is changed whenever searching,
- * however the location hash is changed only when it has '#q=' at the end.
- * So instead of hashchange event chrome.tabs.onUpdated event is used.
- *
+ * ver 2 automatically adds links but sometimes is failed,
+ * maybe adding links by hand is the ultimate solution:
+ * Click page action icon to add links
  */
 
 /* global MutationObserver */
@@ -24,15 +23,8 @@ var observer = new MutationObserver((mutations, observer) => {
   })
 })
 
-if (document.body) {
-  // console.log('body')
-  observe()
-} else {
-  document.addEventListener('DOMContentLoaded', () => {
-    // console.log('DOMContentLoaded')
-    observe()
-  })
-}
+addLinks()
+observe()
 
 function observe () {
   observer.observe(document.body, {
@@ -42,6 +34,8 @@ function observe () {
 }
 
 function addLinks () {
+  if (document.querySelector('._g_s_d')) return
+
   const cites = document.querySelectorAll('#search ._Rm')
 
   if (cites.length) {

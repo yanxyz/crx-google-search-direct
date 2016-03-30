@@ -1,18 +1,23 @@
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  const {status} = changeInfo
-  const {url} = tab
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
+    chrome.declarativeContent.onPageChanged.addRules([
+      {
+        conditions: [
+          new chrome.declarativeContent.PageStateMatcher({
+            pageUrl: {
+              urlPrefix: 'https://www.google.'
+            }
+          })
+        ],
+        actions: [ new chrome.declarativeContent.ShowPageAction() ]
+      }
+    ])
+  })
+})
 
-  // console.log(changeInfo)
-  // console.log(tab)
-  // console.log('--------------------')
-
-  if (status === 'loading' &&
-    url && url.startsWith('https://www.google.') && url.includes('q=')
-    ) {
-    // console.log(url)
-    chrome.tabs.executeScript(tabId, {
-      file: 'js/content.js',
-      runAt: 'document_start'
-    })
-  }
+chrome.pageAction.onClicked.addListener(() => {
+  chrome.tabs.executeScript({
+    file: 'js/content.js',
+    runAt: 'document_end'
+  })
 })

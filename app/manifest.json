@@ -1,20 +1,22 @@
 {
   "manifest_version": 2,
   "name": "Google Search Direct",
-  "description": "Google Chrome extension for adding the original hyperlink to the
-  search results on Google search page.
-  ",
-  "version": "2.1.0",
+  "description": "Add the original hyperlink to the search results on Google search page.",
+  "version": "3.0.0",
   "minimum_chrome_version": "50",
   "author": "Ivan Yan",
   "icons": {
     "128": "icons/128.png"
   },
   "background": {
-    "scripts": ["js/background.js"]
+    "scripts": [
+      "js/background.js"
+    ],
+    "persistent": false
   },
+  "page_action": {},
   "permissions": [
-    "tabs",
-    "https://*/*"
+    "declarativeContent",
+    "activeTab"
   ]
 }
